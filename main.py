@@ -7,7 +7,6 @@ import random
 import tkinter as tk
 import time
 from tkinter.messagebox import showinfo
-import sys
 from config import SHOW_WARNING, POSSIBLE_GAMES, DESCRIPTION, SHOW_NUMBER_AFTER_CLICK
 
 with open('levels_completed.txt') as config:
@@ -80,7 +79,8 @@ def printScore(number, game):
 		with open('levels_completed.txt', 'w') as config:
 			[config.write(i+','+j+'\n') for i, j in zip(LevelStatus, ScoreStatus)]
 		showinfo('You Loose', 'Looser')
-		sys.exit()
+		root2.destroy()
+		main()
 	if len(SCORE_CHECK)==0:
 		global START_TIME, END_TIME
 		END_TIME = time.time()
@@ -90,38 +90,46 @@ def printScore(number, game):
 		ScoreStatus[NUMBER-3] = str(TimeTaken)
 		with open('levels_completed.txt', 'w') as config:
 			[config.write(i+','+j+'\n') for i, j in zip(LevelStatus, ScoreStatus)]
-		sys.exit()
+		root2.destroy()
+		main()
+
+def main():
+	global root
+	root = tk.Tk()
+	root.title('Number Game')
+	root.config(bg='black')
+
+	ro=0
+	temp = 1
+	for game, col in POSSIBLE_GAMES.items():
+		if LevelStatus[game-3]=="1":
+			colour = 'chartreuse'
+		elif LevelStatus[game-3]=="2":
+			colour = 'gold'	
+		else:
+			colour = 'dark red'
+		GameWidget(master=root, num=game, row=ro, column=col, colour=colour)
+		ro+=1
+		if ro==4:
+			ro=0
+			temp+=1
+
+	#COMPLETE LABEL
+	tk.Label(root, text='Completed', font = ['Arial', 20], bg = 'black', fg = 'white').grid(row=0, column=3)
+	tk.Entry(root, width=4, bg='chartreuse').grid(row=0, column=4)
+	#PENDING LABEL
+	tk.Label(root, text='Pending', font = ['Arial', 20], bg = 'black', fg = 'white').grid(row=1, column=3)
+	tk.Entry(root, width=4, bg='gold').grid(row=1, column=4)
+	#NOT STARTED LABEL
+	tk.Label(root, text='Not Started', font = ['Arial', 20], bg = 'black', fg = 'white').grid(row=2, column=3)
+	tk.Entry(root, width=4, bg='dark red').grid(row=2, column=4)
+	#Show Stats
+	tk.Button(root, text = 'Score Card', font=['Arial', 20], command = showStats, bg='grey', fg='cyan').grid(row=3, column=3, columnspan=2)
+
+	root.mainloop()
 
 
-root = tk.Tk()
-root.title('Number Game')
-root.config(bg='black')
 
-ro=0
-temp = 1
-for game, col in POSSIBLE_GAMES.items():
-	if LevelStatus[game-3]=="1":
-		colour = 'chartreuse'
-	elif LevelStatus[game-3]=="2":
-		colour = 'gold'	
-	else:
-		colour = 'dark red'
-	GameWidget(master=root, num=game, row=ro, column=col, colour=colour)
-	ro+=1
-	if ro==4:
-		ro=0
-		temp+=1
 
-#COMPLETE LABEL
-tk.Label(root, text='Completed', font = ['Arial', 20], bg = 'black', fg = 'white').grid(row=0, column=3)
-tk.Entry(root, width=4, bg='chartreuse').grid(row=0, column=4)
-#PENDING LABEL
-tk.Label(root, text='Pending', font = ['Arial', 20], bg = 'black', fg = 'white').grid(row=1, column=3)
-tk.Entry(root, width=4, bg='gold').grid(row=1, column=4)
-#NOT STARTED LABEL
-tk.Label(root, text='Not Started', font = ['Arial', 20], bg = 'black', fg = 'white').grid(row=2, column=3)
-tk.Entry(root, width=4, bg='dark red').grid(row=2, column=4)
-#Show Stats
-tk.Button(root, text = 'Score Card', font=['Arial', 20], command = showStats, bg='grey', fg='cyan').grid(row=3, column=3, columnspan=2)
-
-root.mainloop()
+if __name__ == '__main__':
+	main()
